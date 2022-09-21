@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    // "lib": ["es6", "dom", "es2017"],
+    // "target": "es5",
+    "types": ["cypress", "cypress-xpath"],
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "extends": "@tsconfig/cypress/tsconfig.json",
+  },
+  "include": ["**/*.ts", "support/e2e.ts", "support/commands.ts"]
+}
