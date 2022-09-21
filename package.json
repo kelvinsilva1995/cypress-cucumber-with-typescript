@@ -1,6 +1,9 @@
 {
   "devDependencies": {
-    "cypress": "^10.8.0"
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.1.4",
+    "cypress": "^10.8.0",
+    "esbuild": "^0.15.8",
+    "multiple-cucumber-html-reporter": "^2.0.0"
   },
   "dependencies": {
     "@badeball/cypress-cucumber-preprocessor": "^13.0.1"
