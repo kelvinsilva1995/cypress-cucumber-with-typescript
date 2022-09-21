@@ -1,0 +1,9 @@
+node_modules
+screenshots
+debug.log
+report
+package-lock.json
+cucumber-json
+report
+allure-report
+allure-results
