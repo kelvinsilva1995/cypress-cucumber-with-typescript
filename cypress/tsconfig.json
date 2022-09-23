@@ -2,9 +2,31 @@
   "compilerOptions": {
     // "lib": ["es6", "dom", "es2017"],
     // "target": "es5",
-    "types": ["cypress"],
-    "resolveJsonModule": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "strict": true,
     "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "target": "ES2017",
+    "module": "CommonJS",
+    "types": [
+      "node",
+      "cypress"
+    ],
+    "lib": [
+      "dom",
+      "ES2021"
+    ]
   },
-  "include": ["**/*.ts", "support/e2e.ts", "support/commands.ts"]
+  "include": [
+    "**/*.ts",
+    "support/e2e.ts",
+    "support/commands.ts",
+    "methods.ts",
+    "declarations.d.ts",
+    "browserify.ts",
+    "esbuild.ts",
+    "webpack.ts"
+  ]
 }
