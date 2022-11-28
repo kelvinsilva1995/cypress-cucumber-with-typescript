@@ -7,7 +7,12 @@
     "cypress:runner": "cypress open",
     "cypress:execution": "cypress run",
     "cypress:allure": "npx cypress run -e TAGS=\"@test\" --env allure=true ",
-    "cypress:atualizaVersion": "npm install --save-dev cypress"
+    "cypress:atualizaVersion": "npm install --save-dev cypress",
+    "cy:open": "yarn cypress open --env allure=true --browser chrome",
+    "cy:run": "yarn cypress run -e TAGS=\"@test\" --config video=false --env allure=true --browser chrome",
+    "allure:report": "allure generate allure-results --clean -o allure-report",
+    "allure:clear": "rm -r allure-results/ allure-report/latest cypress/screenshots || true",
+    "allure:history": "mv -f allure-report/latest/history allure-results/history && rm -r allure-report/latest || true"
   },
   "keywords": [
     "cypress"
