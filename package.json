@@ -6,7 +6,7 @@
   "scripts": {
     "cypress:runner": "cypress open",
     "cypress:execution": "cypress run",
-    "cypress:allure": "npx cypress run -e TAGS=\"@test\" --env allure=true",
+    "cypress:allure": "npx cypress run -e TAGS=\"@test\" --env allure=true --config video=false",
     "cypress:atualizaVersion": "npm install --save-dev cypress",
     "cy:open": "yarn cypress open --env allure=true --browser chrome",
     "cy:run": "yarn cypress run -e TAGS=\"@test\" --config video=false --env allure=true --browser chrome",
