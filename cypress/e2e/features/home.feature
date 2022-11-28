@@ -1,3 +1,4 @@
+@test
 Feature: Home page
 
     Feature Home page will work depending on the user credentials.

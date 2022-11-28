@@ -2,6 +2,9 @@
   "compilerOptions": {
     // "lib": ["es6", "dom", "es2017"],
     // "target": "es5",
+    "allowJs": true,
+    "baseUrl": "./",
+    "noEmit": true,
     "declaration": true,
     "skipLibCheck": true,
     "strict": true,
@@ -12,7 +15,8 @@
     "module": "CommonJS",
     "types": [
       "node",
-      "cypress"
+      "cypress",
+      "@shelex/cypress-allure-plugin"
     ],
     "lib": [
       "dom",
