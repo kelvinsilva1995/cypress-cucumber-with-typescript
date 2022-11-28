@@ -6,11 +6,11 @@
   "scripts": {
     "cypress:runner": "cypress open",
     "cypress:execution": "cypress run",
-    "cypress:allure": "npx cypress run -e TAGS=\"@test\" --env allure=true ",
+    "cypress:allure": "npx cypress run -e TAGS=\"@test\" --env allure=true",
     "cypress:atualizaVersion": "npm install --save-dev cypress",
     "cy:open": "yarn cypress open --env allure=true --browser chrome",
     "cy:run": "yarn cypress run -e TAGS=\"@test\" --config video=false --env allure=true --browser chrome",
-    "test": "cypress-tags run --browser chrome --headless -e TAGS=\"@test\"",
+    "test": "cypress-tags run --browser chrome --headless -e TAGS=\"@test\" --env allure=true",
     "testing": "cypress-tags run -e TAGS=\"@testing\" --browser chrome --headed --no-exit",
     "service": "cypress-tags run --browser chrome -e TAGS=\"@service\"",
     "roteiro": "cypress-tags run --browser chrome --headless -e TAGS=\"@roteiro\"",
