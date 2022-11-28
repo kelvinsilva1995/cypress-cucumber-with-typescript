@@ -10,6 +10,11 @@
     "cypress:atualizaVersion": "npm install --save-dev cypress",
     "cy:open": "yarn cypress open --env allure=true --browser chrome",
     "cy:run": "yarn cypress run -e TAGS=\"@test\" --config video=false --env allure=true --browser chrome",
+    "test": "cypress-tags run --browser chrome --headless -e TAGS=\"@test\"",
+    "testing": "cypress-tags run -e TAGS=\"@testing\" --browser chrome --headed --no-exit",
+    "service": "cypress-tags run --browser chrome -e TAGS=\"@service\"",
+    "roteiro": "cypress-tags run --browser chrome --headless -e TAGS=\"@roteiro\"",
+    "tags": "cypress-tags run --browser chrome --headless -e TAGS=\"$TAGS\"",
     "allure:report": "allure generate allure-results --clean -o allure-report",
     "allure:clear": "rm -r allure-results/ allure-report/latest cypress/screenshots || true",
     "allure:history": "mv -f allure-report/latest/history allure-results/history && rm -r allure-report/latest || true"
