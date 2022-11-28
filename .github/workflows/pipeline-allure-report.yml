@@ -1,92 +1,170 @@
-name: allure-report
-'on':
-    push:
-        branches:
-            - master
+# name: allure-report
+# 'on':
+#     push:
+#         branches:
+#             - master
+# jobs:
+#     generate-report:
+#         runs-on: ubuntu-latest
+#         steps:
+#             - uses: actions/checkout@v2
+#             - name: Download Cypress
+#               uses: bahmutov/npm-install@v1
+#               env:
+#                   CYPRESS_INSTALL_BINARY: 0
+
+#             - name: Check Cypress cache
+#               run: |
+#                   npx cypress cache path
+#                   npx cypress cache list
+
+#             - name: restore / cache the binary
+#               id: cache-cypress
+#               uses: actions/cache@v1
+#               with:
+#                   path: ~/.cache/Cypress
+#                   key: >-
+#                       cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json')
+#                       }}
+
+#             - name: Prepare Allure history
+#               run: |
+#                   mkdir -p allure-history
+
+#                   echo get newest folder from allure history
+#                   PREVIOUS_HISTORY=$(ls -td allure-history/* | head -1) >/dev/null 2>&1
+
+#                   echo get id of this folder
+#                   PREVIOUS_HISTORY_ID=${PREVIOUS_HISTORY:15}
+#                   [ -z "$PREVIOUS_HISTORY_ID" ] && PREVIOUS_HISTORY_ID=0
+
+#                   CURRENT=1
+#                   NEXT=2
+
+#                   echo current actual report will be moved to id+1 folder
+#                   CURRENTID=$(($PREVIOUS_HISTORY_ID+$CURRENT)) 
+
+#                   echo new report will use id+2 as future allure-history folder name
+#                   NEXTID=$(($PREVIOUS_HISTORY_ID+$NEXT)) 
+
+#                   echo allure history contains 20 latest builds only, so we should remove old ones
+#                   MAX="20"
+#                   [[ "$NEXTID" -gt "$MAX" ]] && rm -r allure-history/$(($NEXTID-$MAX))
+
+#                   echo move actual report to history 
+#                   echo prepare history data + executor info for future run
+
+#                   mkdir -p allure-history/${CURRENTID}/allure-results
+#                   mv allure-results allure-history/${CURRENTID}/
+#                   mkdir -p allure-results && cp -r allure-report/history allure-results/history
+#                   mv allure-report allure-history/${CURRENTID}/allure-report
+
+#                   echo write links that report could be accessed by in future
+#                   echo "{\"name\": \"gh action\",\"buildOrder\": \"${NEXTID}\",\"buildName\": \"gh action\",\"buildUrl\": \"https://github.com/kelvinsilva1995/cypress-cucumber-with-typescript/actions/runs/${{ github.run_id }}\",\"reportUrl\": \"https://github.com/kelvinsilva1995/cypress-cucumber-with-typescript/allure-history/${NEXTID}/allure-report\",\"reportName\": \"test report\"}" > allure-results/executor.json
+
+#             - name: Install Cypress
+#               run: |
+#                   npx cypress install
+#                   npx cypress cache list
+
+#             - name: Run Cypress
+#               run: npm run cy:run
+
+#             - name: Generate Allure report
+#               if: always()
+#               uses: afiore/action-allure-report@v0.1.0
+
+#             - name: Commit report results
+#               if: always()
+#               run: |
+#                   git config --local user.email "action@github.com"
+#                   git config --local user.name "GitHub Action"
+#                   git add allure-report -f
+#                   git add allure-results -f
+#                   git add allure-history -f
+#                   git commit -m "[chore] autogenerate Allure report" -a
+
+#             - name: Push changes
+#               if: always()
+#               uses: ad-m/github-push-action@master
+#               with:
+#                   github_token: '${{ secrets.GITHUB_TOKEN }}'
+#                   force: true
+
+
+name: Execução automação de testes
+
+on:
+  pull_request:
+      types: [synchronize]
+      paths-ignore:
+        - '**.md'
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      teste:
+        description: 'Selecionar testes a serem executados: roteiro / test'
+        required: true
+        default: 'test'
+      browser:
+        description: 'Selecionar o browser: chrome / electron / firefox'
+        required: false
+        default: 'chrome'
+
+env:
+  DEFAULT_TESTE: "roteiro"
+  DEFAULT_BROWSER: "chrome"
+
 jobs:
-    generate-report:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - name: Download Cypress
-              uses: bahmutov/npm-install@v1
-              env:
-                  CYPRESS_INSTALL_BINARY: 0
+  test:
+    name: Cypress run
+    runs-on: ubuntu-latest
+    container: cypress/browsers:node14.16.0-chrome90-ff88
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm install
+      - name: Cypress run 
+        uses: cypress-io/github-action@v2
+        with: 
+          command: npm run ${{github.event.inputs.teste || env.DEFAULT_TESTE}} --browser ${{github.event.inputs.browser || env.DEFAULT_BROWSER}}
+      
+      - name: Get Allure History
+        uses: actions/checkout@v2
+        if: always()
+        with:
+          ref: gh-pages
+          path: gh-pages
+      
+      - name: Generate Allure Report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: allure-results
+          allure_history: allure-history
+          keep_reports: 20
+      
+      - name: Deploy report to Github Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISH_BRANCH: gh-pages
+          publish_dir: allure-history
+          keep_files: true
+        env:
+          PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: allure-history
+          
+      # - name: send message DISCORD Falha
+      #   if: failure()
+      #   run: |- 
+      #     curl --request POST  --url ${{ secrets.WEBHOOK_URL_DISCORD }} --header 'Content-Type: application/json'  --data '{"content": "Notificação da esteitra de testes:","embeds": [{"title": "A execução apresentou uma falha!","description": "Para mais detalhes  [clique aqui](https://bookish-telegram-45f22f1c.pages.github.io/).","color": 8588082}]}'
 
-            - name: Check Cypress cache
-              run: |
-                  npx cypress cache path
-                  npx cypress cache list
-
-            - name: restore / cache the binary
-              id: cache-cypress
-              uses: actions/cache@v1
-              with:
-                  path: ~/.cache/Cypress
-                  key: >-
-                      cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json')
-                      }}
-
-            - name: Prepare Allure history
-              run: |
-                  mkdir -p allure-history
-
-                  echo get newest folder from allure history
-                  PREVIOUS_HISTORY=$(ls -td allure-history/* | head -1) >/dev/null 2>&1
-
-                  echo get id of this folder
-                  PREVIOUS_HISTORY_ID=${PREVIOUS_HISTORY:15}
-                  [ -z "$PREVIOUS_HISTORY_ID" ] && PREVIOUS_HISTORY_ID=0
-
-                  CURRENT=1
-                  NEXT=2
-
-                  echo current actual report will be moved to id+1 folder
-                  CURRENTID=$(($PREVIOUS_HISTORY_ID+$CURRENT)) 
-
-                  echo new report will use id+2 as future allure-history folder name
-                  NEXTID=$(($PREVIOUS_HISTORY_ID+$NEXT)) 
-
-                  echo allure history contains 20 latest builds only, so we should remove old ones
-                  MAX="20"
-                  [[ "$NEXTID" -gt "$MAX" ]] && rm -r allure-history/$(($NEXTID-$MAX))
-
-                  echo move actual report to history 
-                  echo prepare history data + executor info for future run
-
-                  mkdir -p allure-history/${CURRENTID}/allure-results
-                  mv allure-results allure-history/${CURRENTID}/
-                  mkdir -p allure-results && cp -r allure-report/history allure-results/history
-                  mv allure-report allure-history/${CURRENTID}/allure-report
-
-                  echo write links that report could be accessed by in future
-                  echo "{\"name\": \"gh action\",\"buildOrder\": \"${NEXTID}\",\"buildName\": \"gh action\",\"buildUrl\": \"https://github.com/kelvinsilva1995/cypress-cucumber-with-typescript/actions/runs/${{ github.run_id }}\",\"reportUrl\": \"https://github.com/kelvinsilva1995/cypress-cucumber-with-typescript/allure-history/${NEXTID}/allure-report\",\"reportName\": \"test report\"}" > allure-results/executor.json
-
-            - name: Install Cypress
-              run: |
-                  npx cypress install
-                  npx cypress cache list
-
-            - name: Run Cypress
-              run: npm run cy:run
-
-            - name: Generate Allure report
-              if: always()
-              uses: afiore/action-allure-report@v0.1.0
-
-            - name: Commit report results
-              if: always()
-              run: |
-                  git config --local user.email "action@github.com"
-                  git config --local user.name "GitHub Action"
-                  git add allure-report -f
-                  git add allure-results -f
-                  git add allure-history -f
-                  git commit -m "[chore] autogenerate Allure report" -a
-
-            - name: Push changes
-              if: always()
-              uses: ad-m/github-push-action@master
-              with:
-                  github_token: '${{ secrets.GITHUB_TOKEN }}'
-                  force: true
+      # - name: send message DISCORD Sucesso
+      #   if: success()
+      #   run: |-
+      #     curl --request POST  --url ${{ secrets.WEBHOOK_URL_DISCORD }} --header 'Content-Type: application/json'  --data '{"content": "Notificação da esteitra de testes:","embeds": [{"title": "Execução realizada com sucesso!","description": "Para mais detalhes  [clique aqui](https://bookish-telegram-45f22f1c.pages.github.io/).","color": 1007112}]}'
