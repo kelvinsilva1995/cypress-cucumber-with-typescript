@@ -1,0 +1,6 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"passed","Mon Oct 09 20:07:10 GMT 2023","Mon Oct 09 20:07:11 GMT 2023","1075","","Login page","","","","Blocked Login",""
+"passed","Mon Oct 09 20:07:11 GMT 2023","Mon Oct 09 20:07:12 GMT 2023","874","","Login page","","","","Incorrect Username Login",""
+"passed","Mon Oct 09 20:07:12 GMT 2023","Mon Oct 09 20:07:13 GMT 2023","981","","Login page","","","","Incorrect Password Login",""
+"passed","Mon Oct 09 20:07:03 GMT 2023","Mon Oct 09 20:07:06 GMT 2023","3286","","Home page","","","","Validate Home",""
+"passed","Mon Oct 09 20:07:09 GMT 2023","Mon Oct 09 20:07:10 GMT 2023","1348","","Login page","","","","Success Login",""
