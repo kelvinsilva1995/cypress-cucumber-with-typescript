@@ -1,3 +1,4 @@
+import "cypress-axe";
 // ***********************************************************
 // This example support/e2e.js is processed and
 // loaded automatically before your test files.
@@ -14,8 +15,10 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import '@shelex/cypress-allure-plugin';
-import './commands'
+import "./commands";
+import "./accessibility-commands";
+import "@shelex/cypress-allure-plugin";
+require("@frsource/cypress-plugin-visual-regression-diff");
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
